@@ -8,7 +8,7 @@ Value = TypeVar('Value')
 Method = Callable[[Class], Value]
 
 
-class PrefetchedDescriptor(Generic[Class, Value]):
+class FallbackDescriptor(Generic[Class, Value]):
     def __init__(self, func: Method, cached: bool = True, logging: bool = False) -> None:
         """
         Initialize the descriptor.
@@ -64,10 +64,10 @@ class PrefetchedDescriptor(Generic[Class, Value]):
             delattr(obj, self.prop_name)
 
 
-def prefetched_property(
+def fallback_property(
     cached: bool = True,
     logging: bool = False,
-) -> Callable[[Method], PrefetchedDescriptor]:
+) -> Callable[[Method], FallbackDescriptor]:
     """
     Decorate a class method to return a precalculated value instead.
 
@@ -79,6 +79,6 @@ def prefetched_property(
     NOTE: The annotated value must have the same name as the decorated function!
     """
 
-    def inner(func: Method) -> PrefetchedDescriptor:
-        return PrefetchedDescriptor(func, cached=cached, logging=logging)
+    def inner(func: Method) -> FallbackDescriptor:
+        return FallbackDescriptor(func, cached=cached, logging=logging)
     return inner

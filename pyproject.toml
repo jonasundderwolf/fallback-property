@@ -10,9 +10,9 @@ authors = [
 license = "BSD-3-Clause"
 readme = "README.rst"
 
-documentation = "https://github.com/jonasundderwolf/prefetched_property/blob/master/README.rst"
-homepage = "https://github.com/jonasunnderwolf/prefetched_property"
-repository = "https://github.com/jonasundderwolf/prefetched_property"
+documentation = "https://github.com/jonasundderwolf/fallback_property/blob/master/README.rst"
+homepage = "https://github.com/jonasunnderwolf/fallback_property"
+repository = "https://github.com/jonasundderwolf/fallback_property"
 
 classifiers = [
   "Development Status :: 4 - Beta",

@@ -1,6 +1,6 @@
 from django.db import models
 
-from prefetched_property import prefetched_property
+from fallback_property import fallback_property
 
 
 class PipelineQuerySet(models.QuerySet):
@@ -20,7 +20,7 @@ class Pipeline(models.Model):
     class Meta:
         app_label = 'tests'
 
-    @prefetched_property()
+    @fallback_property()
     def total_length(self):
         return sum(self.segments.values_list('length', flat=True))
 

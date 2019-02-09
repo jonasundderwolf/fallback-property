@@ -16,7 +16,7 @@ def pipeline():
 
 
 @pytest.mark.django_db
-def test_prefetched_property(pipeline, django_assert_num_queries):
+def test_fallback_property(pipeline, django_assert_num_queries):
     pipeline = models.Pipeline.objects.get(pk=pipeline.pk)
     with django_assert_num_queries(1):
         assert pipeline.total_length == TOTAL_LENGTH

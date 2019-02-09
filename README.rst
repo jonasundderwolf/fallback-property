@@ -31,16 +31,16 @@ Requirements
 What is it?
 ===========
 
-``prefetched_property`` transforms a function into a property and uses the
+``fallback_property`` transforms a function into a property and uses the
 decorated function as fallback if no value was assigned to the property itself.
-A special descriptor (``prefetched_property.PrefetchedDescriptor``)
+A special descriptor (``fallback_property.FallbackDescriptor``)
 is used internally.
 
 
 Django (or similar frameworks)
 ------------------------------
 
-``prefetched_property`` might be useful if you have a function that aggregates
+``fallback_property`` might be useful if you have a function that aggregates
 values from related objects, which could already be fetched using an annotated
 queryset.
 The decorator will favor the precalculated value over calling the actual method.
@@ -53,13 +53,13 @@ using ``.annotate()``.
 How to use it?
 ==============
 
-Simply define a function and use the decorator ``prefetched_property`` ::
+Simply define a function and use the decorator ``fallback_property`` ::
 
-    from prefetched_property import prefetched_property
+    from fallback_property import fallback_property
 
     class Foo:
 
-        @prefetched_property()
+        @fallback_property()
         def fallback_func(self):
             return 7
 
@@ -67,7 +67,7 @@ Simply define a function and use the decorator ``prefetched_property`` ::
 Arguments
 ---------
 
-The ``prefetched_property()`` has two optional arguments.
+The ``fallback_property()`` has two optional arguments.
 
 ``cached: bool = True``
     If the property is accessed multiple times, call the fallback function only once.
@@ -97,12 +97,12 @@ Suppose we have the following models ::
 
 Calling ``pipline.total_length`` will always trigger another query and is
 even more expensive when dealing with multiple objects. This can be
-optimized by using ``.annotate()`` and ``prefetched_property()`` ::
+optimized by using ``.annotate()`` and ``fallback_property()`` ::
 
     from django.db import models, QuerySet
     from django.db.functions import Coalesce
     from django.db.models import Sum
-    from prefetched_property import prefetched_property
+    from fallback_property import fallback_property
 
 
     class PipelineQuerySet(QuerySet):
@@ -118,7 +118,7 @@ optimized by using ``.annotate()`` and ``prefetched_property()`` ::
 
     class Pipeline(model.Model):
 
-        @prefetched_property(logging=True)
+        @fallback_property(logging=True)
         def total_length(self):
             return sum(self.parts.values_list('length', flat=True))
 
@@ -144,7 +144,7 @@ But for sake of illustration we use it any way ::
     from django.db import models, QuerySet
     from django.db.functions import Coalesce
     from django.db.models import F
-    from prefetched_property import prefetched_property
+    from fallback_property import fallback_property
 
 
     class PartQuerySet(QuerySet):
@@ -170,7 +170,7 @@ But for sake of illustration we use it any way ::
 
         objects = PartQuerySet()
 
-        @prefetched_property()
+        @fallback_property()
         def owner(self):
             return self._owner or self.pipline.owner
 
