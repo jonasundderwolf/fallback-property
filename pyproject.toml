@@ -43,3 +43,21 @@ pytest-django = "^3.3"
 pytest-flake8 = "^1.0"
 pytest-mock = "^1.10"
 tox = "^3.1"
+
+[tool.black]
+line-length = 90
+skip-string-normalization = true
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''

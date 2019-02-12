@@ -3,8 +3,8 @@ from typing import Type, TypeVar, Generic, Callable
 
 logger = logging.getLogger(__name__)
 
-Class = TypeVar('Class')
-Value = TypeVar('Value')
+Class = TypeVar("Class")
+Value = TypeVar("Value")
 Method = Callable[[Class], Value]
 
 
@@ -26,7 +26,7 @@ class FallbackDescriptor(Generic[Class, Value]):
         self.func = func
         self.cached = cached
         self.logging = logging
-        self.prop_name = f'__{self.func.__name__}'
+        self.prop_name = f"__{self.func.__name__}"
 
     def __get__(self, obj: Class, cls: Type[Class]) -> Value:
         """
@@ -37,10 +37,7 @@ class FallbackDescriptor(Generic[Class, Value]):
         """
         if not hasattr(obj, self.prop_name):
             if self.logging:
-                logger.warning(
-                    'Using `%s` without prefetched value.',
-                    self.func,
-                )
+                logger.warning("Using `%s` without prefetched value.", self.func)
 
             value: Value = self.func(obj)
             if self.cached:
@@ -65,8 +62,7 @@ class FallbackDescriptor(Generic[Class, Value]):
 
 
 def fallback_property(
-    cached: bool = True,
-    logging: bool = False,
+    cached: bool = True, logging: bool = False
 ) -> Callable[[Method], FallbackDescriptor]:
     """
     Decorate a class method to return a precalculated value instead.
@@ -81,4 +77,5 @@ def fallback_property(
 
     def inner(func: Method) -> FallbackDescriptor:
         return FallbackDescriptor(func, cached=cached, logging=logging)
+
     return inner
