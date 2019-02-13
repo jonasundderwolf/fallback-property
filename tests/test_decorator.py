@@ -9,6 +9,8 @@ class Product:
     def _total(self):
         return self.units * self.price
 
+    # TOOO fix mypy error
+    #      possible solution: https://github.com/python/mypy/issues/1551#issuecomment-253978622  # NOQA
     @fallback_property()
     def total(self):
         return self._total()
@@ -103,3 +105,33 @@ def test_fallback_property__logging(caplog):
     product.total_with_logging
     assert 'without prefetched value.' in caplog.text
     assert 'Product.total_with_logging' in caplog.text
+
+
+def test_use_like_property():
+    """
+    Use as a function should be possible.
+    """
+    class Foo:
+        @fallback_property
+        def bar(self):
+            """
+            Test.
+            """
+            return 1
+
+    assert Foo().bar == 1
+
+
+def test_use_as_function():
+    """
+    Use as a function should be possible.
+    """
+    class Foo:
+        def _bar(self):
+            """
+            Test.
+            """
+            return 1
+        bar = fallback_property(_bar, logging=False)
+
+    assert Foo().bar == 1

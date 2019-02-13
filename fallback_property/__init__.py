@@ -1,11 +1,25 @@
+import functools
 import logging
-from typing import Type, TypeVar, Generic, Callable
+from typing import Type, TypeVar, Generic, Callable, Optional, Union
 
 logger = logging.getLogger(__name__)
 
 Class = TypeVar("Class")
 Value = TypeVar("Value")
-Method = Callable[[Class], Value]
+FuncType = Callable[[Class], Value]
+Method = TypeVar('Method', bound=FuncType)
+
+CUSTOM_WRAPPER_ASSIGNMENTS = (
+    'admin_order_value',
+    'allow_tags',
+    'boolean',
+    'empty_value_display',
+    'short_description',
+)
+# TODO mypy sees `WRAPPER_ASSIGNMENT` as `Sequence[str]`, even if its actually defined as
+#      `Tuple[str, ...]`. mypy raises an error, since combining a `Sequence` and a `Typle`
+#      using `+` is invalid,
+WRAPPER_ASSIGNMENTS = CUSTOM_WRAPPER_ASSIGNMENTS + functools.WRAPPER_ASSIGNMENTS  # type: ignore  # NOQA
 
 
 class FallbackDescriptor(Generic[Class, Value]):
@@ -22,7 +36,8 @@ class FallbackDescriptor(Generic[Class, Value]):
         logging
             Log a warning if fallback function is used.
         """
-        self.__doc__ = getattr(func, "__doc__")  # keep the docs
+        # TODO mypy expects a `Callable` as first argument, even though it is not required
+        functools.update_wrapper(self, func, assigned=WRAPPER_ASSIGNMENTS)  # type: ignore
         self.func = func
         self.cached = cached
         self.logging = logging
@@ -35,6 +50,9 @@ class FallbackDescriptor(Generic[Class, Value]):
         Return either the cached value or call the underlying function and
         optionally cache its result.
         """
+        # https://stackoverflow.com/a/21629855/7774036
+        if obj is None:
+            return self
         if not hasattr(obj, self.prop_name):
             if self.logging:
                 logger.warning("Using `%s` without prefetched value.", self.func)
@@ -62,8 +80,8 @@ class FallbackDescriptor(Generic[Class, Value]):
 
 
 def fallback_property(
-    cached: bool = True, logging: bool = False
-) -> Callable[[Method], FallbackDescriptor]:
+    method: Optional[Method] = None, cached: bool = True, logging: bool = False
+) -> Union[Callable[[Method], FallbackDescriptor], FallbackDescriptor]:
     """
     Decorate a class method to return a precalculated value instead.
 
@@ -75,7 +93,12 @@ def fallback_property(
     NOTE: The annotated value must have the same name as the decorated function!
     """
 
-    def inner(func: Method) -> FallbackDescriptor:
+    def decorator(func: Method) -> FallbackDescriptor:
         return FallbackDescriptor(func, cached=cached, logging=logging)
 
-    return inner
+    # https://stackoverflow.com/a/4408489/7774036
+    if method:
+        # This was an actual decorator call, ex: @cached_property
+        return decorator(method)
+    # This is a factory call, ex: @cached_property()
+    return decorator
