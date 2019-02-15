@@ -5,8 +5,6 @@ fallback-property
 .. image:: https://img.shields.io/pypi/v/fallback-property.svg
     :target: https://pypi.python.org/pypi/fallback-property
 
-A decorator which prefers a precalculated attribute over calling the decorated method.
-
 Requirements
 ============
 
