@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "prefetched-property"
-version = "1.0.0"
-description = "A @property like decorator which uses a fallback function if no value was assigned."
+name = "fallback-property"
+version = "0.1.0"
+description = "A decorator which prefers a precalculated attribute over calling the decorated method."
 authors = [
     "Jonas und der Wolf GmbH <opensource@jonasundderwolf.de>",
     "Alexander Frenzel <alex@relatedworks.de>",

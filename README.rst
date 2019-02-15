@@ -1,26 +1,25 @@
 ===================
-prefetched-property
+fallback-property
 ===================
 
-.. image:: https://img.shields.io/pypi/v/prefetched-property.svg
-    :target: https://pypi.python.org/pypi/prefetched-property
+.. image:: https://img.shields.io/pypi/v/fallback-property.svg
+    :target: https://pypi.python.org/pypi/fallback-property
 
-.. image:: https://travis-ci.org/jonasundderwolf/prefetched-property.png?branch=master
-    :target: http://travis-ci.org/jonasundderwolf/prefetched-property
+.. image:: https://travis-ci.org/jonasundderwolf/fallback-property.png?branch=master
+    :target: http://travis-ci.org/jonasundderwolf/fallback-property
     :alt: Build Status
 
-.. image:: https://coveralls.io/repos/jonasundderwolf/prefetched-property/badge.png?branch=master
-    :target: https://coveralls.io/r/jonasundderwolf/prefetched-property
+.. image:: https://coveralls.io/repos/jonasundderwolf/fallback-property/badge.png?branch=master
+    :target: https://coveralls.io/r/jonasundderwolf/fallback-property
     :alt: Coverage
 
-.. image:: https://img.shields.io/pypi/pyversions/prefetched-property.svg
+.. image:: https://img.shields.io/pypi/pyversions/fallback-property.svg
 
-.. image:: https://img.shields.io/pypi/status/prefetched-property.svg
+.. image:: https://img.shields.io/pypi/status/fallback-property.svg
 
-.. image:: https://img.shields.io/pypi/l/prefetched-property.svg
+.. image:: https://img.shields.io/pypi/l/fallback-property.svg
 
-A ``@property`` like decorator which uses a fallback function if no value was assigned.
-
+A decorator which prefers a precalculated attribute over calling the decorated method.
 
 Requirements
 ============
@@ -40,13 +39,13 @@ is used internally.
 Django (or similar frameworks)
 ------------------------------
 
-``fallback_property`` might be useful if you have a function that aggregates
+``fallback_property`` is useful if you have a function that aggregates
 values from related objects, which could already be fetched using an annotated
 queryset.
 The decorator will favor the precalculated value over calling the actual method.
 
 It is especially helpful, if you optimize your application and want to
-replace "legacy" or performance critical properties with precalulated values
+replace legacy or performance critical properties with precalulated values
 using ``.annotate()``.
 
 
@@ -73,7 +72,7 @@ The ``fallback_property()`` has two optional arguments.
     If the property is accessed multiple times, call the fallback function only once.
 
 ``logging: bool = False``
-    Log a warning if the fallback function had to be used.
+    Log a warning if there was a fallback to the decorated, original method.
 
 
 Usage Example (Django)
@@ -130,16 +129,16 @@ get a warning, when the fallback function is used ::
     print(pipeline.total_length)
 
 
-**Take note that the annotated value and the property must have the same name.**
+**Important: The annotated value and the property must have the same name.**
 
 
-What about related objects?
----------------------------
+Related objects
+---------------
 
-This does not work well if you want to prefetch related objects.
-The following example is a bit far-fetched, since this could also be achieved
-with a simple ``select_related()``.
-But for sake of illustration we use it any way ::
+When dealing with related objects in Django be aware that the ORM imposes certain limitations:
+
+In the following example one might expect to get an instance of ``User``, but instead the
+value of the primary key is returned::
 
     from django.db import models, QuerySet
     from django.db.functions import Coalesce
@@ -175,13 +174,8 @@ But for sake of illustration we use it any way ::
             return self._owner or self.pipline.owner
 
 
-    print(Part.objects.with_owner().first().owner)
-    1
-
-
-You might expect to get an instance of ``User``, but instead we just get the
-value of the primary key.
-This is due to limitations of the django orm.
+    >>> print(Part.objects.with_owner().first().owner)
+    >>> 1
 
 
 Development
@@ -189,12 +183,13 @@ Development
 
 This project is using `poetry <https://poetry.eustace.io/>`_ to manage all
 dev dependencies.
+
 Clone this repository and run ::
 
    poetry develop
 
+to create a virtual environment with all dependencies.
 
-to create a virtual enviroment with all dependencies.
 You can now run the test suite using ::
 
   poetry run pytest
