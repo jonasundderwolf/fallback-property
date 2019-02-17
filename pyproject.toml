@@ -31,7 +31,6 @@ classifiers = [
 python = ">=3.6"
 
 [tool.poetry.dev-dependencies]
-django = "^2.0"
 flake8 = "^3.5"
 flake8-isort = "^2.5"
 flake8-mypy = "^17.8"
