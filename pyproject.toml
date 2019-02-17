@@ -10,9 +10,9 @@ authors = [
 license = "BSD-3-Clause"
 readme = "README.rst"
 
-documentation = "https://github.com/jonasundderwolf/fallback_property/blob/master/README.rst"
-homepage = "https://github.com/jonasunnderwolf/fallback_property"
-repository = "https://github.com/jonasundderwolf/fallback_property"
+documentation = "https://github.com/jonasundderwolf/fallback-property/blob/master/README.rst"
+homepage = "https://github.com/jonasunnderwolf/fallback-property"
+repository = "https://github.com/jonasundderwolf/fallback-property"
 
 classifiers = [
   "Development Status :: 4 - Beta",
