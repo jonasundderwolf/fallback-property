@@ -9,8 +9,6 @@ class Product:
     def _total(self):
         return self.units * self.price
 
-    # TOOO fix mypy error
-    #      possible solution: https://github.com/python/mypy/issues/1551#issuecomment-253978622  # NOQA
     @fallback_property()
     def total(self):
         return self._total()

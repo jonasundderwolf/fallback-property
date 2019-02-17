@@ -1,6 +1,6 @@
 import functools
 import logging
-from typing import Type, TypeVar, Generic, Callable, Optional, Union
+from typing import Type, TypeVar, Generic, Callable, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,9 @@ WRAPPER_ASSIGNMENTS = CUSTOM_WRAPPER_ASSIGNMENTS + functools.WRAPPER_ASSIGNMENTS
 
 
 class FallbackDescriptor(Generic[Class, Value]):
-    def __init__(self, func: Method, cached: bool = True, logging: bool = False) -> None:
+    def __init__(
+        self, func: Optional[Method] = None, cached: bool = True, logging: bool = False,
+    ) -> None:
         """
         Initialize the descriptor.
 
@@ -35,13 +37,57 @@ class FallbackDescriptor(Generic[Class, Value]):
             Cache the value calculated by `func`.
         logging
             Log a warning if fallback function is used.
+
+
+        `func` is not `None`, when the descriptor is used as a "function", eg.
+
+            def _bar(...) -> ...:
+                 ...
+            bar = fallback_property(_bar)
         """
-        # TODO mypy expects a `Callable` as first argument, even though it is not required
-        functools.update_wrapper(self, func, assigned=WRAPPER_ASSIGNMENTS)  # type: ignore
-        self.func = func
         self.cached = cached
         self.logging = logging
+
+        if func is not None:
+            self.__call__(func)
+
+    def __call__(self, func: Method) -> 'fallback_property':
+        """
+        Apply decorator to specific method.
+
+        Arguments
+        ---------
+        func
+            Fallback function if no value exists.
+
+
+        This method is either called from the constructor, when descriptor is used like
+
+            def _bar(...) -> ...:
+                ...
+            bar = fallback_property(_bar)
+
+        or directly after the descriptor has been created and the function will be wrapped
+
+            # case 1
+            @fallback_property
+            def foo(self) -> ...:
+                ...
+
+            # case 2
+            @fallback_property(...)
+            def foo(self) -> ...:
+                ...
+        """
+        # copy attribute from method to descriptor
+        # TODO mypy expects a `Callable` as first argument, even though it is not required
+        functools.update_wrapper(self, func, assigned=WRAPPER_ASSIGNMENTS)  # type: ignore
+
+        # bind descriptor to method
+        self.func = func
         self.prop_name = f"__{self.func.__name__}"
+
+        return self
 
     def __get__(self, obj: Class, cls: Type[Class]) -> Value:
         """
@@ -79,26 +125,4 @@ class FallbackDescriptor(Generic[Class, Value]):
             delattr(obj, self.prop_name)
 
 
-def fallback_property(
-    method: Optional[Method] = None, cached: bool = True, logging: bool = False
-) -> Union[Callable[[Method], FallbackDescriptor], FallbackDescriptor]:
-    """
-    Decorate a class method to return a precalculated value instead.
-
-    This might be useful if you have a function that aggregates values from
-    related objects, which could already be fetched using an annotated queryset.
-    The decorated methods will favor the precalculated value over calling the
-    actual method.
-
-    NOTE: The annotated value must have the same name as the decorated function!
-    """
-
-    def decorator(func: Method) -> FallbackDescriptor:
-        return FallbackDescriptor(func, cached=cached, logging=logging)
-
-    # https://stackoverflow.com/a/4408489/7774036
-    if method:
-        # This was an actual decorator call, ex: @cached_property
-        return decorator(method)
-    # This is a factory call, ex: @cached_property()
-    return decorator
+fallback_property = FallbackDescriptor
