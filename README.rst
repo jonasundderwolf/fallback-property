@@ -9,9 +9,8 @@ fallback-property
     :target: http://travis-ci.org/jonasundderwolf/fallback-property
     :alt: Build Status
 
-.. image:: https://coveralls.io/repos/jonasundderwolf/fallback-property/badge.png?branch=master
-    :target: https://coveralls.io/r/jonasundderwolf/fallback-property
-    :alt: Coverage
+.. image:: https://coveralls.io/repos/github/jonasundderwolf/fallback-property/badge.svg?branch=master
+   :target: https://coveralls.io/github/jonasundderwolf/fallback-property?branch=master
 
 .. image:: https://img.shields.io/pypi/pyversions/fallback-property.svg
     :target: https://pypi.python.org/pypi/fallback-property
