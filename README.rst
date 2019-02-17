@@ -15,9 +15,6 @@ fallback-property
 
 .. image:: https://img.shields.io/pypi/pyversions/fallback-property.svg
 
-.. image:: https://img.shields.io/pypi/status/fallback-property.svg
-
-.. image:: https://img.shields.io/pypi/l/fallback-property.svg
 
 Requirements
 ============
