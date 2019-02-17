@@ -14,6 +14,7 @@ fallback-property
     :alt: Coverage
 
 .. image:: https://img.shields.io/pypi/pyversions/fallback-property.svg
+    :target: https://pypi.python.org/pypi/fallback-property
 
 
 Requirements
