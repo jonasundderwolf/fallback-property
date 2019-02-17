@@ -5,6 +5,20 @@ fallback-property
 .. image:: https://img.shields.io/pypi/v/fallback-property.svg
     :target: https://pypi.python.org/pypi/fallback-property
 
+.. image:: https://travis-ci.org/jonasundderwolf/fallback-property.png?branch=master
+    :target: http://travis-ci.org/jonasundderwolf/fallback-property
+    :alt: Build Status
+
+.. image:: https://coveralls.io/repos/jonasundderwolf/fallback-property/badge.png?branch=master
+    :target: https://coveralls.io/r/jonasundderwolf/fallback-property
+    :alt: Coverage
+
+.. image:: https://img.shields.io/pypi/pyversions/fallback-property.svg
+
+.. image:: https://img.shields.io/pypi/status/fallback-property.svg
+
+.. image:: https://img.shields.io/pypi/l/fallback-property.svg
+
 Requirements
 ============
 
