@@ -1,15 +1,31 @@
+import functools
 import logging
-from typing import Type, TypeVar, Generic, Callable
+from typing import Type, TypeVar, Generic, Callable, Optional
 
 logger = logging.getLogger(__name__)
 
 Class = TypeVar("Class")
 Value = TypeVar("Value")
-Method = Callable[[Class], Value]
+FuncType = Callable[[Class], Value]
+Method = TypeVar('Method', bound=FuncType)
+
+CUSTOM_WRAPPER_ASSIGNMENTS = (
+    'admin_order_value',
+    'allow_tags',
+    'boolean',
+    'empty_value_display',
+    'short_description',
+)
+# TODO mypy sees `WRAPPER_ASSIGNMENT` as `Sequence[str]`, even if its actually defined as
+#      `Tuple[str, ...]`. mypy raises an error, since combining a `Sequence` and a `Typle`
+#      using `+` is invalid,
+WRAPPER_ASSIGNMENTS = CUSTOM_WRAPPER_ASSIGNMENTS + functools.WRAPPER_ASSIGNMENTS  # type: ignore  # NOQA
 
 
 class FallbackDescriptor(Generic[Class, Value]):
-    def __init__(self, func: Method, cached: bool = True, logging: bool = False) -> None:
+    def __init__(
+        self, func: Optional[Method] = None, cached: bool = True, logging: bool = False,
+    ) -> None:
         """
         Initialize the descriptor.
 
@@ -21,12 +37,57 @@ class FallbackDescriptor(Generic[Class, Value]):
             Cache the value calculated by `func`.
         logging
             Log a warning if fallback function is used.
+
+
+        `func` is not `None`, when the descriptor is used as a "function", eg.
+
+            def _bar(...) -> ...:
+                 ...
+            bar = fallback_property(_bar)
         """
-        self.__doc__ = getattr(func, "__doc__")  # keep the docs
-        self.func = func
         self.cached = cached
         self.logging = logging
+
+        if func is not None:
+            self.__call__(func)
+
+    def __call__(self, func: Method) -> 'fallback_property':
+        """
+        Apply decorator to specific method.
+
+        Arguments
+        ---------
+        func
+            Fallback function if no value exists.
+
+
+        This method is either called from the constructor, when descriptor is used like
+
+            def _bar(...) -> ...:
+                ...
+            bar = fallback_property(_bar)
+
+        or directly after the descriptor has been created and the function will be wrapped
+
+            # case 1
+            @fallback_property
+            def foo(self) -> ...:
+                ...
+
+            # case 2
+            @fallback_property(...)
+            def foo(self) -> ...:
+                ...
+        """
+        # copy attribute from method to descriptor
+        # TODO mypy expects a `Callable` as first argument, even though it is not required
+        functools.update_wrapper(self, func, assigned=WRAPPER_ASSIGNMENTS)  # type: ignore
+
+        # bind descriptor to method
+        self.func = func
         self.prop_name = f"__{self.func.__name__}"
+
+        return self
 
     def __get__(self, obj: Class, cls: Type[Class]) -> Value:
         """
@@ -35,6 +96,9 @@ class FallbackDescriptor(Generic[Class, Value]):
         Return either the cached value or call the underlying function and
         optionally cache its result.
         """
+        # https://stackoverflow.com/a/21629855/7774036
+        if obj is None:
+            return self
         if not hasattr(obj, self.prop_name):
             if self.logging:
                 logger.warning("Using `%s` without prefetched value.", self.func)
@@ -61,21 +125,4 @@ class FallbackDescriptor(Generic[Class, Value]):
             delattr(obj, self.prop_name)
 
 
-def fallback_property(
-    cached: bool = True, logging: bool = False
-) -> Callable[[Method], FallbackDescriptor]:
-    """
-    Decorate a class method to return a precalculated value instead.
-
-    This might be useful if you have a function that aggregates values from
-    related objects, which could already be fetched using an annotated queryset.
-    The decorated methods will favor the precalculated value over calling the
-    actual method.
-
-    NOTE: The annotated value must have the same name as the decorated function!
-    """
-
-    def inner(func: Method) -> FallbackDescriptor:
-        return FallbackDescriptor(func, cached=cached, logging=logging)
-
-    return inner
+fallback_property = FallbackDescriptor
