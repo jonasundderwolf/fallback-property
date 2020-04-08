@@ -7,10 +7,10 @@
   "homepage": "",
   "dependencies": {},
   "devDependencies": {
-    "@commitlint/cli": "^7.0.0",
-    "@commitlint/config-angular": "^7.0.1",
-    "@commitlint/travis-cli": "^7.0.0",
-    "husky": "^0.14.3"
+    "@commitlint/cli": "^8.3.0",
+    "@commitlint/config-angular": "^8.3.0",
+    "@commitlint/travis-cli": "^8.3.0",
+    "husky": "^4.2.3"
   },
   "scripts": {
     "commitmsg": "commitlint -e $GIT_PARAMS"
