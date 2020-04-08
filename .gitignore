@@ -1,8 +1,8 @@
 # Linux
-.*
-!.gitignore
-!.travis.yml
+.git
 
+# PyCharm
+.idea
 
 # vim
 .*.sw[a-z]

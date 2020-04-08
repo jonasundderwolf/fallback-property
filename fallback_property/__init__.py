@@ -1,6 +1,6 @@
 import functools
 import logging
-from typing import Type, TypeVar, Generic, Callable, Optional
+from typing import Callable, Generic, Optional, Type, TypeVar
 
 logger = logging.getLogger(__name__)
 
