@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fallback-property"
-version = "0.1.0"
+version = "0.1.1"
 description = "A decorator which prefers a precalculated attribute over calling the decorated method."
 authors = [
     "Jonas und der Wolf GmbH <opensource@jonasundderwolf.de>",
@@ -18,11 +18,16 @@ classifiers = [
   "Development Status :: 4 - Beta",
   "Environment :: Web Environment",
   "Framework :: Django",
+  "Framework :: Django :: 1.11",
+  "Framework :: Django :: 2.2",
+  "Framework :: Django :: 3.0",
   "Intended Audience :: Developers",
   "Operating System :: OS Independent",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.6",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 

@@ -19,7 +19,7 @@ fallback-property
 Requirements
 ============
 
-- Python 3.6
+- Python 3.6+
 
 
 What is it?
